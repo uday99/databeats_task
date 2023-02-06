@@ -94,9 +94,14 @@ class List_Movies(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self,request):
-        movie_data=MovieModel.objects.all()
-        ms=MovieSerializer(movie_data,many=True)
-        return Response(ms.data,status=status.HTTP_200_OK)
+        try:
+            movie_data=MovieModel.objects.all()
+            ms=MovieSerializer(movie_data,many=True)
+            return Response(ms.data,status=status.HTTP_200_OK)
+        except MovieModel.DoesNotExist:
+            content={"error":"No movies List"}
+            return Response(content,status=status.HTTP_404_NOT_FOUND)
+
 
 
 class Movie_Details(APIView):
@@ -104,6 +109,10 @@ class Movie_Details(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self,request,id):
-        mdata=MovieModel.objects.get(pk=id)
-        ms=MovieSerializer(mdata)
-        return Response(ms.data,status=status.HTTP_200_OK)
+        try:
+            mdata=MovieModel.objects.get(pk=id)
+            ms=MovieSerializer(mdata)
+            return Response(ms.data,status=status.HTTP_200_OK)
+        except MovieModel.DoesNotExist:
+            content={'error':"Movie Doesn't exists"}
+            return Response(content,status=status.HTTP_404_NOT_FOUND)
